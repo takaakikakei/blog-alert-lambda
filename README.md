@@ -80,10 +80,12 @@ Slack チャンネル ID とワークスペース ID を後で利用するので
 パラメータ名はそれぞれ以下で保存します。
 
 - Slack チャンネル ID
-    - 名前： /alert-lambda/dev/SLACK_CHANNEL_ID
+    - 名前： /alert-lambda/ステージ名/SLACK_CHANNEL_ID
+        - 例： /alert-lambda/dev/SLACK_CHANNEL_ID
     - 値（例）： C01U80K9KPD
 - ワークスペース ID
-    - 名前： /alert-lambda/dev/SLACK_WORKSPACE_ID
+    - 名前： /alert-lambda/ステージ名/SLACK_WORKSPACE_ID
+        - 例： /alert-lambda/dev/SLACK_WORKSPACE_ID
     - 値（例）： T01UXHUCRMW
 
 
