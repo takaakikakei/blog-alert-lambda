@@ -1,0 +1,109 @@
+service: alert-lambda
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: python3.9
+  lambdaHashingVersion: 20201221
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, "ap-northeast-1"}
+  memorySize: 256
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - 'ssm:GetParameter'
+            - 'sts:AssumeRole'
+            - 'logs:DescribeLogGroups'
+            - 'cloudwatch:DescribeAlarms'
+            - 'cloudwatch:PutMetricAlarm'
+            - 'cloudwatch:DeleteAlarms'
+            - 'lambda:ListFunctions'
+          Resource:
+            - '*'
+  environment: ${self:custom.environment}
+functions:
+  add:
+    handler: src/handlers/add.handler
+    timeout: 300
+  delete:
+    handler: src/handlers/delete.handler
+    timeout: 300
+  create_error:
+    handler: src/handlers/create_error.handler
+    timeout: 60
+plugins:
+  - serverless-step-functions
+  - serverless-python-requirements
+  - serverless-prune-plugin
+stepFunctions: ${file(includes/state-machines.yml)}
+custom:
+  pythonRequirements:
+    usePipenv: true
+  prune:
+    automatic: true
+    number: 3
+  environment:
+    STAGE: ${self:provider.stage}
+    SLACK_CHANNEL_ID: ${ssm(${self:provider.region}):/${self:service}/${self:provider.stage}/SLACK_CHANNEL_ID}
+    SLACK_WORKSPACE_ID: ${ssm(${self:provider.region}):/${self:service}/${self:provider.stage}/SLACK_WORKSPACE_ID}
+    SNS_TOPIC_ARN:
+      Ref: AlertLambdaTopic
+package:
+  patterns:
+    - '!./**'
+    - ./src/**/*.py
+resources:
+  Conditions:
+    CreateTokyoResources:
+      Fn::Equals:
+        - !Ref AWS::Region
+        - ap-northeast-1
+  Resources:
+    AlertLambdaTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: "AlertLambda-${self:provider.stage}-${self:provider.region}"
+        TopicName: "AlertLambdaTopic-${self:provider.stage}-${self:provider.region}"
+    AlertLambdaChatbotRole:
+      Type: "AWS::IAM::Role"
+      Condition: CreateTokyoResources
+      Properties:
+        RoleName: "AlertLambdaChatbotRole-${self:provider.stage}"
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: chatbot.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: "AlertLambdaChatbotPolicy-${self:provider.stage}"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - cloudwatch:Describe*
+                    - cloudwatch:Get*
+                    - cloudwatch:List*
+                    - logs:Describe*
+                    - logs:Get*
+                    - logs:List*
+                    - logs:StartQuery
+                    - logs:StopQuery
+                    - logs:TestMetricFilter
+                    - logs:FilterLogEvents
+                  Resource:
+                    - "*"
+    AlertLambdaChatbot:
+      Type: "AWS::Chatbot::SlackChannelConfiguration"
+      Condition: CreateTokyoResources
+      Properties:
+        ConfigurationName: "AlertLambdaChatbot-${self:provider.stage}"
+        GuardrailPolicies:
+          - "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"
+        IamRoleArn: !GetAtt AlertLambdaChatbotRole.Arn
+        LoggingLevel: INFO
+        SlackChannelId: "${self:custom.environment.SLACK_CHANNEL_ID}"
+        SlackWorkspaceId: "${self:custom.environment.SLACK_WORKSPACE_ID}"

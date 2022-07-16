@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+boto3 = "*"
+requests = "*"
+zenpy = "*"
+tld = "*"
+slack-sdk = "*"
+cmp-py-client = {git = "ssh://git@github.com/classmethod-aws/cmp-py-client"}
+boto3-stubs = {extras = ["cloudwatch,logs,lambda"], version = "*"}
+
+[dev-packages]
+isort = "*"
+flake8 = "*"
+black = "*"
+mypy = "*"
+rope = "*"
+pytest = "*"
+pytest-cov = "*"
+autoflake8 = "*"
+pytest-mock = "*"
+flake8-black = "*"
+flake8-mypy = "*"
+
+[requires]
+python_version = "3.9"

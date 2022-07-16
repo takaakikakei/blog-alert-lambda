@@ -1,0 +1,27 @@
+stateMachines:
+  AlertLambda-Add:
+    events:
+      - schedule: cron(00 03 * * ? *) #https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/services-cloudwatchevents-expressions.html
+    name: AlertLambda-Add-${self:provider.stage}
+    definition:
+      StartAt: Add
+      States:
+        Add:
+          Type: Task
+          InputPath: "$"
+          Resource:
+            Fn::GetAtt: [add, Arn]
+          ResultPath: "$"
+          End: true
+  AlertLambda-Delete:
+    name: AlertLambda-Delete-${self:provider.stage}
+    definition:
+      StartAt: Delete
+      States:
+        Delete:
+          Type: Task
+          InputPath: "$"
+          Resource:
+            Fn::GetAtt: [delete, Arn]
+          ResultPath: "$"
+          End: true

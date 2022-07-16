@@ -1,0 +1,21 @@
+{
+  "name": "alert-lambda",
+  "version": "1.0.0",
+  "description": "LambdaのErrorログをSlack通知するツール",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/classmethod-aws/template-ope-sls.git"
+  },
+  "bugs": {
+    "url": "https://github.com/classmethod-aws/template-ope-sls/issues"
+  },
+  "homepage": "https://github.com/classmethod-aws/template-ope-sls#readme",
+  "dependencies": {
+    "serverless": "^3.21.0"
+  },
+  "devDependencies": {
+    "serverless-prune-plugin": "^2.0.1",
+    "serverless-python-requirements": "^5.4.0",
+    "serverless-step-functions": "^3.7.0"
+  }
+}
