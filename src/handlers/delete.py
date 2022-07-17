@@ -8,7 +8,7 @@ logger.setLevel(logging.INFO)
 
 def handler(event, context) -> None:
     """
-    delete のエンドポイント
+    delete のエントリポイント
     """
 
     try:

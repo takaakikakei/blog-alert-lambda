@@ -9,7 +9,7 @@ logger.setLevel(logging.INFO)
 
 def handler(event, context) -> Dict:
     """
-    add のエンドポイント
+    add のエントリポイント
     """
 
     try:
