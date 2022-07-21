@@ -64,7 +64,7 @@ class CloudWatchService:
             ],
             Period=60,
             EvaluationPeriods=1,
-            DatapointsToAlarm=1,
+            DatapointsToAlarm=5,
             Threshold=1.0,
             ComparisonOperator="GreaterThanOrEqualToThreshold",
             TreatMissingData="missing",
